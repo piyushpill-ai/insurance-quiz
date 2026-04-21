@@ -311,6 +311,23 @@ h2 {
   color: #6b7280;
 }
 
+.score-amount {
+  font-size: 30px;
+  font-weight: 800;
+  color: #0073e6;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.score-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
 .match-badge {
   display: inline-block;
   padding: 3px 10px;

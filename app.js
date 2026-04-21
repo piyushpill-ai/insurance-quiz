@@ -748,6 +748,19 @@ function formatNum(n) {
   return (n || 0).toLocaleString();
 }
 
+// Map a sorted list of insurers (cheapest first) to a score between 9.9 and 5.0
+function assignScores(list) {
+  if (!list.length) return list;
+  const prices = list.map(i => i.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const top = 9.9, bottom = 5.0;
+  return list.map(i => {
+    const score = max === min ? top : top - ((i.price - min) / (max - min)) * (top - bottom);
+    return { ...i, score: +score.toFixed(1) };
+  });
+}
+
 // ========== HOME LITE steps ==========
 const homeLiteSteps = [
   {
@@ -970,10 +983,10 @@ function renderHomeResults(opts = {}) {
     return true;
   });
 
-  const priced = eligible.map(i => ({
+  const priced = assignScores(eligible.map(i => ({
     ...i,
     price: calcHomePremium(i.basePrice, a),
-  })).sort((x, y) => x.price - y.price);
+  })).sort((x, y) => x.price - y.price));
 
   const typeLabel = { B: 'Building only', C: 'Contents only', H: 'Home (Building + Contents)' }[a.insuranceType];
 
@@ -1001,18 +1014,18 @@ function renderHomeResults(opts = {}) {
     <div class="insurer-card">
       <div class="insurer-left">
         <div class="insurer-name">${p.name}</div>
-        <div class="insurer-meta">Annual premium · ${typeLabel}</div>
+        <div class="insurer-meta">${typeLabel}</div>
         <span class="match-badge ${idx === 0 ? '' : 'good'}">${idx === 0 ? 'Best match' : 'Eligible'}</span>
       </div>
       <div class="insurer-price">
-        <div class="price-amount">$${formatNum(p.price)}</div>
-        <div class="price-period">per year</div>
+        <div class="score-amount">${p.score.toFixed(1)}</div>
+        <div class="score-label">Finder Score</div>
       </div>
     </div>
   `).join('');
 
   const notes = [];
-  if (lite) notes.push("Estimate only — complete the full quiz for an accurate quote.");
+  if (lite) notes.push("Estimate only — complete the full quiz for an accurate Finder Score.");
   if (isFibro) notes.push("Some insurers exclude fibro construction — filtered accordingly.");
   if (isHomeBiz) notes.push("Home business filters applied.");
   if (oldUnrepairedRoof) notes.push("Older unrepaired roof — limited eligibility.");
@@ -1066,10 +1079,10 @@ function renderCarResults(opts = {}) {
     return true;
   });
 
-  const priced = eligible.map(i => ({
+  const priced = assignScores(eligible.map(i => ({
     ...i,
     price: calcCarPremium(i.basePrice, a),
-  })).sort((x, y) => x.price - y.price);
+  })).sort((x, y) => x.price - y.price));
 
   const coverLabel = a.coverType;
 
@@ -1097,12 +1110,12 @@ function renderCarResults(opts = {}) {
     <div class="insurer-card">
       <div class="insurer-left">
         <div class="insurer-name">${p.name}</div>
-        <div class="insurer-meta">Annual premium · ${coverLabel}</div>
+        <div class="insurer-meta">${coverLabel}</div>
         <span class="match-badge ${idx === 0 ? '' : 'good'}">${idx === 0 ? 'Best match' : 'Eligible'}</span>
       </div>
       <div class="insurer-price">
-        <div class="price-amount">$${formatNum(p.price)}</div>
-        <div class="price-period">per year</div>
+        <div class="score-amount">${p.score.toFixed(1)}</div>
+        <div class="score-label">Finder Score</div>
       </div>
     </div>
   `).join('');
