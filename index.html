@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiz Flow</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">Quiz<span> </span>Flow</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+      <div id="progressText" class="progress-text">Step 1 of 8</div>
+    </div>
+  </header>
+
+  <main id="main" class="card"></main>
+
+  <footer class="footer">
+    <button id="backBtn" class="btn-secondary" disabled>Back</button>
+    <button id="nextBtn" class="btn-primary">Next</button>
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
