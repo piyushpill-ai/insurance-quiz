@@ -226,13 +226,17 @@ function renderResults() {
     </div>
   `).join('');
 
+  const tipPrice = "We calculate a Price Score using quotes from pre-determined personas that are the closest match to your selections. The Price Score gives an approximate guide on how expensive or cheap a product would be. This is not a representation of the quote you will get.";
+  const tipFeature = "We calculate a Feature Score for each product, weighting up popular features and any limits associated with them. These include but are not limited to Core coverage, Convenience and Extras, Payment flexibility, Repairs and emergency support.";
+  const tipFinder = "Based on your selection between Price, Features and Comprehensiveness, this score is dynamically calculated to upweight what you have selected as more important.";
+
   return summary + `
     <div class="results-table">
       <div class="results-row header-row">
         <div>Brand</div>
-        <div>Price Score</div>
-        <div>Feature Score</div>
-        <div>Finder Score</div>
+        <div class="tooltip-host" data-tooltip="${tipPrice}" title="${tipPrice}">Price Score <span class="info-icon">ⓘ</span></div>
+        <div class="tooltip-host" data-tooltip="${tipFeature}" title="${tipFeature}">Feature Score <span class="info-icon">ⓘ</span></div>
+        <div class="tooltip-host" data-tooltip="${tipFinder}" title="${tipFinder}">Finder Score <span class="info-icon">ⓘ</span></div>
       </div>
       ${rows}
     </div>

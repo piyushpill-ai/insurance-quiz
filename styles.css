@@ -487,9 +487,77 @@ h2 {
 .results-table {
   border: 2px solid rgba(0, 0, 0, 0.12);
   border-radius: 14px;
-  overflow: hidden;
   background: #fff;
   margin-bottom: 14px;
+}
+
+.results-row.header-row:first-child {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.tooltip-host {
+  position: relative;
+  cursor: help;
+}
+
+.info-icon {
+  font-size: 13px;
+  color: #0073e6;
+  margin-left: 3px;
+  opacity: 0.8;
+}
+
+.tooltip-host::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  width: 280px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.55;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.tooltip-host::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: #1a1a2e;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.tooltip-host:hover::after,
+.tooltip-host:hover::before {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .tooltip-host::after {
+    width: 220px;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
 }
 
 .results-row {
