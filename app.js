@@ -15,7 +15,6 @@ const AGE_BRACKET_TO_PERSONA = {
   '>60': 65,
 };
 
-const TIP_PRICE_SCORE = "You will be shown a price score based on a sample of quotes we collect. While this is not a 1:1 representation of the price you get, our Price Scores aim to give you a rough estimation of how expensive a product might be for you.";
 const TIP_AGE = "We collect quotes for male and female 20, 25, 30, 40, 50, 60 and 65 year olds. Based on the age bracket you select, a price score will be shown to you based on the age that closest matches your age bracket range. For example, if you select 20-25, you will be shown a price score that reflects the profile of a 25 year old driver.";
 const TIP_CAR_TYPE = "We collect quotes for a 2020 Toyota Corolla sedan and Kia SUV. Based on your selection, you will be shown a Price Score that closest reflects your car type.";
 const TIP_PRIORITY = "Based on your selection, our Finder Score will upweight the relevant selection between Price and Features, with Comprehensiveness weighting both equally. You will be shown a Price Score, based on an average quote from personas that reflect your selections, a Feature Score that shows what each product covers, and an overall Finder Score.";
@@ -26,7 +25,6 @@ const steps = [
     id: "coverType",
     title: "What level of car cover do you need?",
     subtitle: "Different products cover different risks.",
-    tip: TIP_PRICE_SCORE,
     render: () => optionGrid("coverType", [
       { value: "Comprehensive", icon: "🛡️", label: "Comprehensive", desc: "Covers your car + others' property" },
       { value: "Third Party Fire & Theft", icon: "🔥", label: "Third Party Fire & Theft", desc: "Others' property + fire/theft" },
