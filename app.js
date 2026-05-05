@@ -404,332 +404,118 @@ const homeSteps = [
 ];
 
 // ========== CAR insurance steps ==========
+const AGE_BRACKET_TO_PERSONA = {
+  '18-20': 20,
+  '20-25': 25,
+  '25-30': 30,
+  '30-40': 40,
+  '40-50': 50,
+  '50-60': 60,
+  '>60': 65,
+};
+
+const TIP_PRICE_SCORE = "You will be shown a price score based on a sample of quotes we collect. While this is not a 1:1 representation of the price you get, our Price Scores aim to give you a rough estimation of how expensive a product might be for you.";
+const TIP_AGE = "We collect quotes for male and female 20, 25, 30, 40, 50, 60 and 65 year olds. Based on the age bracket you select, a price score will be shown to you based on the age that closest matches your age bracket range. For example, if you select 20-25, you will be shown a price score that reflects the profile of a 25 year old driver.";
+const TIP_CAR_TYPE = "We collect quotes for a 2020 Toyota Corolla sedan and Kia SUV. Based on your selection, you will be shown a Price Score that closest reflects your car type.";
+const TIP_PRIORITY = "Based on your selection, our Finder Score will upweight the relevant selection between Price and Features, with Comprehensiveness weighting both equally. You will be shown a Price Score, based on an average quote from personas that reflect your selections, a Feature Score that shows what each product covers, and an overall Finder Score.";
+
 const carSteps = [
   {
     id: "coverType",
     title: "What level of car cover do you need?",
     subtitle: "Different products cover different risks.",
+    tip: TIP_PRICE_SCORE,
     render: () => optionGrid("coverType", [
-      { value: "Comprehensive", icon: "🛡️", label: "Comprehensive", desc: "Covers your car + others' property" },
-      { value: "Third Party Fire & Theft", icon: "🔥", label: "Third Party Fire & Theft", desc: "Others' property + fire/theft" },
-      { value: "Third Party", icon: "🚗", label: "Third Party Property", desc: "Only damage to other vehicles" },
+      { value: "Comprehensive", icon: "\ud83d\udee1\ufe0f", label: "Comprehensive", desc: "Covers your car + others' property" },
+      { value: "Third Party Fire & Theft", icon: "\ud83d\udd25", label: "Third Party Fire & Theft", desc: "Others' property + fire/theft" },
+      { value: "Third Party", icon: "\ud83d\ude97", label: "Third Party Property", desc: "Only damage to other vehicles" },
     ]),
     validate: () => state.answers.coverType ? null : "Please pick a cover type.",
   },
 
   {
-    id: "driver",
-    title: "About the main driver",
-    subtitle: "We match you with insurers based on your profile.",
+    id: "demographics",
+    title: "About you",
+    subtitle: "Your gender and age bracket.",
+    tip: TIP_AGE,
     render: () => `
-      <div class="grid-2">
-        <div class="field">
-          <label>Age</label>
-          <input type="number" id="age" min="16" max="100" value="${state.answers.age || ''}" placeholder="e.g. 35" />
-        </div>
-        <div class="field">
-          <label>Gender</label>
-          <select id="gender">
-            <option value="">Select...</option>
-            <option ${state.answers.gender === 'Male' ? 'selected' : ''}>Male</option>
-            <option ${state.answers.gender === 'Female' ? 'selected' : ''}>Female</option>
-            <option ${state.answers.gender === 'Other' ? 'selected' : ''}>Other</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>Gender</label>
+        ${optionGrid("gender", [
+          { value: "Male", label: "Male" },
+          { value: "Female", label: "Female" },
+        ], "two-col")}
       </div>
       <div class="field">
-        <label>Age when you got your licence</label>
-        <input type="number" id="licenceAge" min="15" max="80" value="${state.answers.licenceAge || ''}" placeholder="e.g. 18" />
+        <label>Age bracket</label>
+        ${optionGrid("ageBracket", [
+          { value: "18-20", label: "18-20" },
+          { value: "20-25", label: "20-25" },
+          { value: "25-30", label: "25-30" },
+          { value: "30-40", label: "30-40" },
+          { value: "40-50", label: "40-50" },
+          { value: "50-60", label: "50-60" },
+          { value: ">60", label: "Over 60" },
+        ], "three-col")}
       </div>
     `,
-    readInputs: () => {
-      state.answers.age = +document.getElementById('age').value || null;
-      state.answers.gender = document.getElementById('gender').value;
-      state.answers.licenceAge = +document.getElementById('licenceAge').value || null;
-    },
     validate: () => {
-      if (!state.answers.age || state.answers.age < 16) return "Please enter a valid age.";
       if (!state.answers.gender) return "Please select gender.";
-      if (!state.answers.licenceAge) return "Please enter licence age.";
-      if (state.answers.licenceAge > state.answers.age) return "Licence age can't be greater than current age.";
-      return null;
-    },
-    onNext: () => {
-      state.answers.yearsLicensed = state.answers.age - state.answers.licenceAge;
-    },
-  },
-
-  {
-    id: "secondDriver",
-    title: "Any other drivers?",
-    subtitle: "Adding drivers affects your premium.",
-    render: () => `
-      <div class="field">
-        <label>Will anyone else regularly drive this car?</label>
-        <div class="yn-toggle" data-group="hasSecondDriver">
-          <button class="option ${state.answers.hasSecondDriver === 'Yes' ? 'selected' : ''}" data-val="Yes">Yes</button>
-          <button class="option ${state.answers.hasSecondDriver === 'No' ? 'selected' : ''}" data-val="No">No</button>
-        </div>
-      </div>
-      ${state.answers.hasSecondDriver === 'Yes' ? `
-        <div class="grid-2">
-          <div class="field">
-            <label>Second driver age</label>
-            <input type="number" id="secondDriverAge" min="16" max="100" value="${state.answers.secondDriverAge || ''}" placeholder="e.g. 28" />
-          </div>
-          <div class="field">
-            <label>Second driver gender</label>
-            <select id="secondDriverGender">
-              <option value="">Select...</option>
-              <option ${state.answers.secondDriverGender === 'Male' ? 'selected' : ''}>Male</option>
-              <option ${state.answers.secondDriverGender === 'Female' ? 'selected' : ''}>Female</option>
-              <option ${state.answers.secondDriverGender === 'Other' ? 'selected' : ''}>Other</option>
-            </select>
-          </div>
-        </div>
-      ` : ''}
-    `,
-    readInputs: () => {
-      const a = document.getElementById('secondDriverAge');
-      const g = document.getElementById('secondDriverGender');
-      if (a) state.answers.secondDriverAge = +a.value || null;
-      if (g) state.answers.secondDriverGender = g.value;
-    },
-    validate: () => {
-      if (!state.answers.hasSecondDriver) return "Please answer the second driver question.";
-      if (state.answers.hasSecondDriver === 'Yes') {
-        if (!state.answers.secondDriverAge) return "Enter second driver age.";
-        if (!state.answers.secondDriverGender) return "Select second driver gender.";
-      }
+      if (!state.answers.ageBracket) return "Please select an age bracket.";
       return null;
     },
   },
 
   {
-    id: "vehicle",
-    title: "Your vehicle",
-    subtitle: "Details of the car you want to insure.",
-    render: () => `
-      <div class="field">
-        <label>Vehicle (make, model, year)</label>
-        <input type="text" id="vehicle" value="${state.answers.vehicle || ''}" placeholder="e.g. Toyota Corolla 2019" />
-      </div>
-      <div class="field">
-        <label>Vehicle colour</label>
-        ${optionGrid("vehicleColour", [
-          { value: "White", label: "White" },
-          { value: "Silver", label: "Silver" },
-          { value: "Black", label: "Black" },
-          { value: "Blue", label: "Blue" },
-          { value: "Red", label: "Red" },
-          { value: "Yellow", label: "Yellow" },
-          { value: "Other", label: "Other" },
-        ], "three-col")}
-      </div>
-      <div class="field">
-        <label>Do you own the car or is it on finance / lease?</label>
-        ${optionGrid("carOwnership", [
-          { value: "Owner", label: "Own outright" },
-          { value: "Finance", label: "Finance / Loan" },
-          { value: "Lease", label: "Lease / Hire Purchase" },
-        ], "three-col")}
-      </div>
-      ${state.answers.carOwnership === 'Finance' || state.answers.carOwnership === 'Lease' ? `
-        <div class="field">
-          <label>Finance type</label>
-          ${optionGrid("financeType", [
-            { value: "Hire Purchase", label: "Hire Purchase" },
-            { value: "Novated Lease", label: "Novated Lease" },
-            { value: "Standard Loan", label: "Standard Loan" },
-          ], "three-col")}
-        </div>
-      ` : ''}
-    `,
-    readInputs: () => {
-      state.answers.vehicle = document.getElementById('vehicle').value.trim();
-    },
-    validate: () => {
-      if (!state.answers.vehicle) return "Enter vehicle details.";
-      if (!state.answers.vehicleColour) return "Select vehicle colour.";
-      if (!state.answers.carOwnership) return "Select ownership status.";
-      if ((state.answers.carOwnership === 'Finance' || state.answers.carOwnership === 'Lease') && !state.answers.financeType) return "Select finance type.";
-      return null;
-    },
+    id: "state",
+    title: "What state do you live in?",
+    subtitle: "Pricing varies between states.",
+    render: () => optionGrid("state", [
+      { value: "NSW", label: "NSW" },
+      { value: "VIC", label: "VIC" },
+      { value: "QLD", label: "QLD" },
+      { value: "TAS", label: "TAS" },
+      { value: "WA", label: "WA" },
+      { value: "SA", label: "SA" },
+    ], "three-col"),
+    validate: () => state.answers.state ? null : "Please select a state.",
   },
 
   {
-    id: "usage",
-    title: "How you use the car",
-    subtitle: "Usage patterns affect risk and premium.",
-    render: () => `
-      <div class="field">
-        <label>What do you use it for?</label>
-        ${optionGrid("carUsage", [
-          { value: "Private", label: "Private use only" },
-          { value: "Business", label: "Business / commuting" },
-          { value: "Courier", label: "Courier / rideshare" },
-        ], "three-col")}
-      </div>
-      <div class="field">
-        <label>Your current life stage</label>
-        ${optionGrid("lifeStage", [
-          { value: "Full time", label: "Full time work" },
-          { value: "Part time", label: "Part time / Study" },
-          { value: "Retired", label: "Retired" },
-        ], "three-col")}
-      </div>
-      <div class="field">
-        <label>Estimated annual kilometres</label>
-        <select id="annualKm">
-          <option value="">Select...</option>
-          <option value="5000" ${state.answers.annualKm === 5000 ? 'selected' : ''}>Under 5,000 km</option>
-          <option value="10000" ${state.answers.annualKm === 10000 ? 'selected' : ''}>5,000 – 10,000 km</option>
-          <option value="15000" ${state.answers.annualKm === 15000 ? 'selected' : ''}>10,000 – 15,000 km</option>
-          <option value="20000" ${state.answers.annualKm === 20000 ? 'selected' : ''}>15,000 – 20,000 km</option>
-          <option value="30000" ${state.answers.annualKm === 30000 ? 'selected' : ''}>Over 20,000 km</option>
-        </select>
-      </div>
-    `,
-    readInputs: () => {
-      state.answers.annualKm = +document.getElementById('annualKm').value || null;
-    },
-    validate: () => {
-      if (!state.answers.carUsage) return "Select car usage.";
-      if (!state.answers.lifeStage) return "Select life stage.";
-      if (!state.answers.annualKm) return "Select annual kilometres.";
-      return null;
-    },
+    id: "carType",
+    title: "What car type do you drive?",
+    subtitle: "We map this to a representative vehicle for pricing.",
+    tip: TIP_CAR_TYPE,
+    render: () => optionGrid("carType", [
+      { value: "Small car", icon: "\ud83d\ude97", label: "Small car", desc: "Hatchback, sedan" },
+      { value: "Large car", icon: "\ud83d\ude99", label: "Large car", desc: "SUV, 4WD" },
+    ], "two-col"),
+    validate: () => state.answers.carType ? null : "Please select a car type.",
   },
 
   {
-    id: "parking",
-    title: "Where is the car parked?",
-    subtitle: "Secure parking reduces theft risk.",
-    render: () => `
-      <div class="field">
-        <label>Overnight parking</label>
-        ${optionGrid("nightGarage", [
-          { value: "Garage", icon: "🏠", label: "Locked garage" },
-          { value: "Carport", icon: "🏕️", label: "Carport" },
-          { value: "Driveway", icon: "🚗", label: "Driveway / Street" },
-        ], "three-col")}
-      </div>
-      <div class="field">
-        <label>Daytime parking</label>
-        ${optionGrid("dayGarage", [
-          { value: "Garage", label: "Garage" },
-          { value: "Carport", label: "Carport" },
-          { value: "Driveway", label: "Driveway" },
-          { value: "Street", label: "Street / Open lot" },
-          { value: "Workplace", label: "Workplace parking" },
-        ], "three-col")}
-      </div>
-      <div class="field">
-        <label>Postcode where car is parked during the day</label>
-        <input type="text" id="dayPostcode" inputmode="numeric" maxlength="4" value="${state.answers.dayPostcode || ''}" placeholder="e.g. 2000" />
-      </div>
-    `,
-    readInputs: () => {
-      state.answers.dayPostcode = document.getElementById('dayPostcode').value.trim();
-    },
-    validate: () => {
-      if (!state.answers.nightGarage) return "Select overnight parking.";
-      if (!state.answers.dayGarage) return "Select daytime parking.";
-      if (!/^\d{4}$/.test(state.answers.dayPostcode || '')) return "Enter a valid 4-digit postcode.";
-      return null;
-    },
-  },
-
-  {
-    id: "coverAmount",
-    title: "Sum insured",
-    subtitle: "How much is the car worth?",
-    skipIf: (a) => a.coverType === 'Third Party',
-    render: () => {
-      if (state.answers.sumInsured == null) state.answers.sumInsured = 15000;
-      return `
-        <div class="field">
-          <label>Cover basis</label>
-          ${optionGrid("coverBasis", [
-            { value: "Market Value", label: "Market Value" },
-            { value: "Agreed Value", label: "Agreed Value" },
-          ], "two-col")}
-        </div>
-        <div class="slider-group">
-          <label>Sum insured: <span class="value">$${formatNum(state.answers.sumInsured)}</span></label>
-          <input type="range" id="sumInsured" min="2000" max="150000" step="500" value="${state.answers.sumInsured}" />
-        </div>
-        <div class="conditional">
-          💡 Market Value pays the car's market price at time of claim. Agreed Value locks in the amount.
-        </div>
-      `;
-    },
-    afterRender: () => {
-      const s = document.getElementById('sumInsured');
-      if (s) s.addEventListener('input', e => {
-        state.answers.sumInsured = +e.target.value;
-        e.target.previousElementSibling.querySelector('.value').textContent = '$' + formatNum(+e.target.value);
-      });
-    },
-    validate: () => state.answers.coverBasis ? null : "Select a cover basis.",
-  },
-
-  {
-    id: "carClaims",
-    title: "Insurance history",
-    subtitle: "Your previous insurer and any claims.",
-    render: () => `
-      <div class="field">
-        <label>Previous insurer</label>
-        <select id="previousInsurer">
-          <option value="">Select...</option>
-          ${['Not Insured', 'AAMI', 'ALLIANZ', 'BUDGET DIRECT', 'BINGLE', 'NRMA', 'RACV', 'RACQ', 'SUNCORP', 'TIO', 'YOUI', 'OTHER']
-            .map(n => `<option ${state.answers.previousInsurer === n ? 'selected' : ''}>${n}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field">
-        <label>Years continuously insured</label>
-        <input type="number" id="yearsInsured" min="0" max="50" value="${state.answers.yearsInsured ?? ''}" placeholder="e.g. 3" />
-      </div>
-      <div class="field">
-        <label>Any claims or incidents in the last 3 years?</label>
-        ${optionGrid("claimType", [
-          { value: "No Claims", label: "No claims" },
-          { value: "At fault", label: "At-fault claim" },
-          { value: "Not at fault", label: "Not-at-fault claim" },
-        ], "three-col")}
-      </div>
-      ${state.answers.claimType && state.answers.claimType !== 'No Claims' ? `
-        <div class="field">
-          <label>Months since the claim</label>
-          <input type="number" id="monthsSinceClaim" min="0" max="60" value="${state.answers.monthsSinceClaim || ''}" placeholder="e.g. 14" />
-        </div>
-      ` : ''}
-    `,
-    readInputs: () => {
-      state.answers.previousInsurer = document.getElementById('previousInsurer').value;
-      state.answers.yearsInsured = +document.getElementById('yearsInsured').value || 0;
-      const m = document.getElementById('monthsSinceClaim');
-      if (m) state.answers.monthsSinceClaim = +m.value || 0;
-    },
-    validate: () => {
-      if (!state.answers.previousInsurer) return "Select a previous insurer.";
-      if (state.answers.yearsInsured == null) return "Enter years insured.";
-      if (!state.answers.claimType) return "Answer the claims question.";
-      if (state.answers.claimType !== 'No Claims' && !state.answers.monthsSinceClaim) return "Enter months since claim.";
-      return null;
-    },
+    id: "priority",
+    title: "What's most important to you?",
+    subtitle: "We'll weight your Finder Score accordingly.",
+    tip: TIP_PRIORITY,
+    render: () => optionGrid("priority", [
+      { value: "Price", icon: "\ud83d\udcb0", label: "Price", desc: "I want the cheapest" },
+      { value: "Features", icon: "\ud83d\udccb", label: "Features", desc: "I want the most cover" },
+      { value: "Comprehensiveness", icon: "\u2696\ufe0f", label: "Comprehensiveness", desc: "Balance of both" },
+    ], "three-col"),
+    validate: () => state.answers.priority ? null : "Please select a priority.",
   },
 
   {
     id: "results",
     title: "Your matched car policies",
-    subtitle: "Based on your answers, here are the products you're eligible for.",
+    subtitle: "Compare scores across our partners.",
     render: () => renderCarResults(),
     validate: () => null,
     isLast: true,
   },
 ];
+
 
 // ========== Helpers ==========
 function optionGrid(key, opts, cols = "") {
@@ -936,7 +722,7 @@ const carLiteSteps = [
     id: "results",
     title: "Your estimated car policies",
     subtitle: "Approximate premiums based on limited info. Finalise a quote with the full quiz.",
-    render: () => renderCarResults({ lite: true }),
+    render: () => renderCarLiteResults(),
     validate: () => null,
     isLast: true,
   },
@@ -1056,19 +842,107 @@ function calcHomePremium(base, a) {
 
 // ========== Results: CAR ==========
 const carInsurers = [
-  { name: "AAMI", basePrice: 950, minAge: 21, excludesCourier: false, excludesAtFault: false },
-  { name: "NRMA", basePrice: 990, minAge: 21, excludesCourier: true, excludesAtFault: false },
-  { name: "Allianz", basePrice: 1050, minAge: 25, excludesCourier: false, excludesAtFault: false },
-  { name: "Budget Direct", basePrice: 780, minAge: 25, excludesCourier: true, excludesAtFault: true },
-  { name: "Bingle", basePrice: 720, minAge: 21, excludesCourier: true, excludesAtFault: true },
-  { name: "Youi", basePrice: 880, minAge: 18, excludesCourier: false, excludesAtFault: false },
-  { name: "RACV", basePrice: 920, minAge: 21, excludesCourier: false, excludesAtFault: false },
-  { name: "Suncorp", basePrice: 900, minAge: 21, excludesCourier: true, excludesAtFault: false },
+  { name: "AAMI", basePrice: 950, minAge: 21, featureScore: 8.7, excludesCourier: false, excludesAtFault: false },
+  { name: "NRMA", basePrice: 990, minAge: 21, featureScore: 9.1, excludesCourier: true, excludesAtFault: false },
+  { name: "Allianz", basePrice: 1050, minAge: 25, featureScore: 8.9, excludesCourier: false, excludesAtFault: false },
+  { name: "Budget Direct", basePrice: 780, minAge: 25, featureScore: 6.8, excludesCourier: true, excludesAtFault: true },
+  { name: "Bingle", basePrice: 720, minAge: 21, featureScore: 5.9, excludesCourier: true, excludesAtFault: true },
+  { name: "Youi", basePrice: 880, minAge: 18, featureScore: 8.4, excludesCourier: false, excludesAtFault: false },
+  { name: "RACV", basePrice: 920, minAge: 21, featureScore: 8.6, excludesCourier: false, excludesAtFault: false },
+  { name: "Suncorp", basePrice: 900, minAge: 21, featureScore: 8.2, excludesCourier: true, excludesAtFault: false },
 ];
 
-function renderCarResults(opts = {}) {
+// New full Car Insurance results: Price Score, Feature Score, Finder Score
+function renderCarResults() {
   const a = state.answers;
-  const lite = !!opts.lite;
+  const personaAge = AGE_BRACKET_TO_PERSONA[a.ageBracket] || 30;
+
+  const eligible = carInsurers.filter(i => personaAge >= i.minAge);
+
+  const withPrice = eligible.map(i => ({
+    ...i,
+    price: calcCarPriceFull(i.basePrice, personaAge, a.gender, a.state, a.carType, a.coverType),
+  })).sort((x, y) => x.price - y.price);
+
+  const scored = assignScores(withPrice).map(i => ({
+    ...i,
+    priceScore: i.score,
+    finderScore: computeFinderScore(i.score, i.featureScore, a.priority),
+  }));
+
+  scored.sort((x, y) => y.finderScore - x.finderScore);
+
+  const summary = `
+    <div class="results-summary">
+      <strong>${a.coverType}</strong> · ${a.gender} ${a.ageBracket} · ${a.state} · ${a.carType}<br>
+      Priority: <strong>${a.priority}</strong> · Persona: <strong>${personaAge}y/o ${a.gender}</strong>
+    </div>
+  `;
+
+  if (!scored.length) {
+    return summary + `<div class="conditional">
+      Unfortunately none of our partners match your profile — please contact our team for a tailored quote.
+    </div>`;
+  }
+
+  const rows = scored.map(p => `
+    <div class="results-row">
+      <div class="brand-cell">${p.name}</div>
+      <div class="score-cell">${p.priceScore.toFixed(1)}</div>
+      <div class="score-cell">${p.featureScore.toFixed(1)}</div>
+      <div class="score-cell finder-cell">${p.finderScore.toFixed(1)}</div>
+    </div>
+  `).join('');
+
+  const table = `
+    <div class="results-table">
+      <div class="results-row header-row">
+        <div>Brand</div>
+        <div>Price Score</div>
+        <div>Feature Score</div>
+        <div>Finder Score</div>
+      </div>
+      ${rows}
+    </div>
+  `;
+
+  return summary + table;
+}
+
+function calcCarPriceFull(base, personaAge, gender, stateCode, carType, coverType) {
+  let p = base;
+  if (coverType === 'Third Party Fire & Theft') p *= 0.6;
+  else if (coverType === 'Third Party') p *= 0.35;
+
+  if (personaAge <= 20) p *= 1.55;
+  else if (personaAge <= 25) p *= 1.25;
+  else if (personaAge <= 30) p *= 1.05;
+  else if (personaAge <= 40) p *= 1.0;
+  else if (personaAge <= 50) p *= 0.95;
+  else if (personaAge <= 60) p *= 0.92;
+  else p *= 0.95;
+
+  if (gender === 'Female') p *= 0.95;
+
+  if (carType === 'Large car') p *= 1.18;
+
+  const stateMul = { NSW: 1.10, VIC: 1.05, WA: 1.00, QLD: 0.97, SA: 0.95, TAS: 0.93 };
+  p *= stateMul[stateCode] || 1.0;
+
+  return p;
+}
+
+function computeFinderScore(priceScore, featureScore, priority) {
+  let pw, fw;
+  if (priority === 'Price') { pw = 0.7; fw = 0.3; }
+  else if (priority === 'Features') { pw = 0.3; fw = 0.7; }
+  else { pw = 0.5; fw = 0.5; }
+  return +(priceScore * pw + featureScore * fw).toFixed(1);
+}
+
+// Legacy results renderer for the Lite flow (which still asks age/usage/claims)
+function renderCarLiteResults() {
+  const a = state.answers;
   const isCourier = a.carUsage === 'Courier';
   const recentAtFault = a.claimType === 'At fault' && (a.monthsSinceClaim || 0) < 24;
 
@@ -1086,17 +960,10 @@ function renderCarResults(opts = {}) {
 
   const coverLabel = a.coverType;
 
-  let summary = lite ? `
+  const summary = `
     <div class="results-summary">
       <strong>${coverLabel}</strong> · ${a.age}y/o ${a.gender}<br>
       ${a.address}
-    </div>
-  ` : `
-    <div class="results-summary">
-      <strong>${coverLabel}</strong> · ${a.vehicle || 'Your vehicle'} · ${a.carUsage} use<br>
-      Main driver: <strong>${a.age}y/o ${a.gender}</strong> · ${a.yearsLicensed} yrs licensed
-      ${a.hasSecondDriver === 'Yes' ? ` · +1 driver (${a.secondDriverAge}y/o)` : ''}
-      ${a.sumInsured ? ` · Sum insured: <strong>$${formatNum(a.sumInsured)}</strong>` : ''}
     </div>
   `;
 
@@ -1120,14 +987,12 @@ function renderCarResults(opts = {}) {
     </div>
   `).join('');
 
-  const notes = [];
-  if (lite) notes.push("Estimate only — complete the full quiz for an accurate quote.");
+  const notes = ["Estimate only — complete the full quiz for an accurate Finder Score."];
   if (a.age < 25) notes.push("Under-25 drivers attract a loading.");
   if (isCourier) notes.push("Courier/rideshare filters applied — some insurers excluded.");
   if (recentAtFault) notes.push("Recent at-fault claim affects eligibility and pricing.");
-  if (!lite && a.yearsLicensed < 3) notes.push("Less than 3 years licensed — limited discounts.");
 
-  return summary + cards + (notes.length ? `<div class="conditional">⚠️ ${notes.join(' ')}</div>` : '');
+  return summary + cards + `<div class="conditional">⚠️ ${notes.join(' ')}</div>`;
 }
 
 function calcCarPremium(base, a) {
@@ -1196,9 +1061,10 @@ function renderHome() {
     });
   });
 
-  // Hide progress + footer on home
+  // Hide progress + footer + side tip on home
   document.querySelector('.progress-wrap').style.visibility = 'hidden';
   document.querySelector('.footer').style.display = 'none';
+  document.getElementById('sideTip').classList.add('hidden');
 }
 
 // ========== Render engine ==========
@@ -1221,6 +1087,19 @@ function render() {
     ${step.render()}
     <div id="errorBox"></div>
   `;
+
+  const sideTip = document.getElementById('sideTip');
+  if (step.tip) {
+    sideTip.classList.remove('hidden');
+    sideTip.innerHTML = `
+      <span class="tip-icon">💡</span>
+      <div class="tip-title">Did you know?</div>
+      <div>${step.tip}</div>
+    `;
+  } else {
+    sideTip.classList.add('hidden');
+    sideTip.innerHTML = '';
+  }
 
   main.querySelectorAll('.options, .yn-toggle').forEach(group => {
     const key = group.dataset.group;

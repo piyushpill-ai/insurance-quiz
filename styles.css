@@ -12,13 +12,55 @@ body {
   padding: 20px;
 }
 
-.app {
-  max-width: 720px;
+.page {
+  max-width: 1080px;
   margin: 40px auto;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.app {
+  flex: 1;
+  min-width: 0;
   background: #ffd200;
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+}
+
+.side-tip {
+  width: 300px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 40px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #1a1a2e;
+  border: 2px solid #ffd200;
+}
+
+.side-tip.hidden {
+  display: none;
+}
+
+.side-tip .tip-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.side-tip .tip-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #0073e6;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
 }
 
 .header {
@@ -424,8 +466,14 @@ h2 {
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 960px) {
+  .page { flex-direction: column; max-width: 720px; }
+  .side-tip { width: 100%; position: static; }
+}
+
 @media (max-width: 600px) {
-  .app { margin: 0; border-radius: 0; }
+  .page { margin: 0; }
+  .app { border-radius: 0; }
   .card { padding: 24px; }
   .header { padding: 20px 24px 16px; }
   .footer { padding: 16px 24px; }
@@ -433,4 +481,59 @@ h2 {
   .options.two-col { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   .product-grid { grid-template-columns: 1fr; }
+}
+
+/* Results table for new car flow */
+.results-table {
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 14px;
+}
+
+.results-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 14px 18px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  gap: 10px;
+}
+
+.results-row:last-child { border-bottom: none; }
+
+.results-row.header-row {
+  background: #f6f8fa;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.6px;
+}
+
+.brand-cell {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1a1a2e;
+}
+
+.score-cell {
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: #374151;
+}
+
+.score-cell.finder-cell {
+  color: #0073e6;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+@media (max-width: 600px) {
+  .results-row { grid-template-columns: 1.5fr 1fr 1fr 1fr; padding: 12px 10px; font-size: 13px; }
+  .brand-cell { font-size: 13px; }
+  .score-cell { font-size: 13px; }
+  .score-cell.finder-cell { font-size: 17px; }
 }
